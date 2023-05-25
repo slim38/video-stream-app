@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PartialVideoData } from './interfaces/partial-video-data.interface';
+import { PartialVideoData } from './models/partial-video-data.interface';
 import { createReadStream, statSync } from 'fs';
 
 @Injectable()
@@ -9,7 +9,7 @@ export class AppService {
   }
   
   getTestVideoRange(range: string): PartialVideoData {
-    const videoPath = process.env.VIDEO_DIR + "/bigbuck.mp4";
+    const videoPath = process.env.VIDEO_DIR + "/uploaded1.mp4";
     const videoSize = statSync(videoPath).size;
 
     let start: number;

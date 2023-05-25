@@ -1,12 +1,15 @@
-import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Logger, ParseFilePipe, ParseFilePipeBuilder, Post, Req, Res, UploadedFile, UploadedFiles, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AppService } from './app.service';
-import { Request, Response } from 'express';
-import * as fs from 'fs';
-import { PartialVideoData } from './interfaces/partial-video-data.interface';
+import { Request, Response, response } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express/multer';
+import { createWriteStream } from 'fs';
+import { VideoUploadMetadataDTO } from './models/video-upload-metadata.interface';
+import { VideoFileValidator } from './validators/video-file-validator';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) { }
+  private readonly logger = new Logger(AppController.name);
 
   @Get()
   getHello(): string {
@@ -18,13 +21,10 @@ export class AppController {
     @Req() req: Request,
     @Res() res: Response
   ) {
-    // Ensure there is a range given for the video
     const range = req.headers.range;
 
-    // get video stats (about 61MB)
     const videoData = this.appService.getTestVideoRange(range);
 
-    // Create headers
     const contentLength = videoData.end - videoData.start + 1;
     const headers = {
       "Content-Range": `bytes ${videoData.start}-${videoData.end}/${videoData.videoSize}`,
@@ -33,12 +33,33 @@ export class AppController {
       "Content-Type": "video/mp4",
     };
 
-    // HTTP Status 206 for Partial Content
     res.writeHead(206, headers);
 
-    console.log(`piping bytes: ${videoData.start} - ${videoData.end}`);
-
-    // Stream the video chunk to the client
+    this.logger.log(`Test Endpoint - piping bytes: ${videoData.start} - ${videoData.end}`);
     videoData.stream.pipe(res);
+  }
+
+  @Post('uploadTest')
+  async uploadFile(@Req() request: Request, @Res() response: Response) {
+    const writeFile = createWriteStream('./videos/uploaded1.mp4');
+    request.on('end', () => { response.send() });
+    request.pipe(writeFile);
+  }
+
+  @Post('upload')
+  @UsePipes(new ValidationPipe())
+  @UseInterceptors(FileInterceptor('file'))
+  uploadFile2(
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addMaxSizeValidator({ maxSize: 1000000000 })
+        .addValidator(new VideoFileValidator())
+        .build({ errorHttpStatusCode: HttpStatus.BAD_REQUEST })
+    )
+    file: Express.Multer.File,
+    @Body() body: VideoUploadMetadataDTO
+  ) {
+    const fileWriter = createWriteStream(`./${process.env.VIDEO_DIR}/new.mp4`);
+    fileWriter.write(file.buffer);
   }
 }

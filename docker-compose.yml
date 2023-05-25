@@ -1,0 +1,20 @@
+version: '3.2'
+services:
+  streaming-service:
+    build: ./streaming-service
+    environment:
+      VIDEO_DIR: ./videos
+    ports:
+      - "3000:3000"
+    volumes:
+      - "./streaming-service/videos:/usr/app/videos"
+    networks:
+        default:
+            aliases:  
+                - streaming-service
+  
+  
+
+networks:
+  default:
+    driver: bridge
