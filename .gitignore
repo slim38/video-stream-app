@@ -1,4 +1,4 @@
 /.DS_Store
 streaming-service/node_modules
 streaming-service/dist
-streaming-service/videos/
+streaming-service/videos/*
