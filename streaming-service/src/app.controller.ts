@@ -1,14 +1,17 @@
-import { Body, Controller, Get, HttpStatus, Logger, ParseFilePipe, ParseFilePipeBuilder, Post, Req, Res, UploadedFile, UploadedFiles, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Inject, Logger, OnModuleInit, ParseFilePipe, ParseFilePipeBuilder, Post, Req, Res, UploadedFile, UploadedFiles, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Request, Response, response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express/multer';
 import { createWriteStream } from 'fs';
 import { VideoUploadMetadataDTO } from './models/video-upload-metadata.interface';
 import { VideoFileValidator } from './validators/video-file-validator';
+import { ClientKafka, EventPattern, MessagePattern } from '@nestjs/microservices';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) { }
+  constructor(
+    private readonly appService: AppService,
+    ) { }
   private readonly logger = new Logger(AppController.name);
 
   @Get()
