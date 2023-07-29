@@ -14,10 +14,10 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         options: {
           client: {
             clientId: 'streaming-service',
-            brokers: ['broker:29092'],
+            brokers: [`${process.env.KAFKA_BROKER}`],
           },
           consumer: {
-            groupId: 'streaming-service'
+            groupId: 'streaming-service-mod'
           }
         }
       },
