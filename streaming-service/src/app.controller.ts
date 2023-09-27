@@ -1,13 +1,12 @@
-import { Body, Controller, Get, HttpStatus, Inject, Logger, OnModuleInit, ParseFilePipe, ParseFilePipeBuilder, Post, Req, Res, UploadedFile, UploadedFiles, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Inject, Logger, OnModuleInit, Param, ParseFilePipe, ParseFilePipeBuilder, Post, Req, Res, UploadedFile, UploadedFiles, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Request, Response, response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express/multer';
 import { createWriteStream } from 'fs';
 import { VideoUploadMetadataDTO } from './models/video-upload-metadata.interface';
 import { VideoFileValidator } from './validators/video-file-validator';
-import { ClientKafka, EventPattern, MessagePattern } from '@nestjs/microservices';
 
-@Controller()
+@Controller('videos')
 export class AppController {
   constructor(
     private readonly appService: AppService,
@@ -19,26 +18,26 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Get('test-video')
+  @Get(':id')
   getTestVideo(
     @Req() req: Request,
-    @Res() res: Response
+    @Res() res: Response,
+    @Param('id') id: string,
   ) {
     const range = req.headers.range;
 
-    const videoData = this.appService.getTestVideoRange(range);
+    const videoData = this.appService.getPartialVideoData(id, range);
 
     const contentLength = videoData.end - videoData.start + 1;
     const headers = {
       "Content-Range": `bytes ${videoData.start}-${videoData.end}/${videoData.videoSize}`,
       "Accept-Ranges": "bytes",
       "Content-Length": contentLength,
-      "Content-Type": "video/mp4",
+      "Content-Type": "video/webm",
     };
 
     res.writeHead(206, headers);
 
-    this.logger.log(`Test Endpoint - piping bytes: ${videoData.start} - ${videoData.end}`);
     videoData.stream.pipe(res);
   }
 
@@ -49,7 +48,7 @@ export class AppController {
     request.pipe(writeFile);
   }
 
-  @Post('upload')
+  @Post()
   @UsePipes(new ValidationPipe())
   @UseInterceptors(FileInterceptor('file'))
   uploadFile2(
@@ -62,7 +61,6 @@ export class AppController {
     file: Express.Multer.File,
     @Body() body: VideoUploadMetadataDTO
   ) {
-    const fileWriter = createWriteStream(`./${process.env.VIDEO_DIR}/new.mp4`);
-    fileWriter.write(file.buffer);
+    this.appService.saveAndPublishVideo(file, body);
   }
 }

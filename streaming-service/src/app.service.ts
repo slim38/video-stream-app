@@ -1,10 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PartialVideoData } from './models/partial-video-data.interface';
-import { createReadStream, statSync } from 'fs';
-import { networkInterfaces } from 'os';
-import { Kafka } from 'kafkajs';
-import { VideoUploadMetadata } from './models/video-upload-metadata.interface';
+import { createReadStream, createWriteStream, statSync } from 'fs';
+import { VideoUploadEvent, VideoUploadMetadata } from './models/video-upload-metadata.interface';
 import { ClientKafka } from '@nestjs/microservices';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AppService {
@@ -18,8 +17,8 @@ export class AppService {
     return 'Hello World!';
   }
   
-  getTestVideoRange(range: string): PartialVideoData {
-    const videoPath = process.env.VIDEO_DIR + "/uploaded1.mp4";
+  getPartialVideoData(id: string, range: string): PartialVideoData {
+    const videoPath = `${process.env.VIDEO_DIR}/${id}`;
     const videoSize = statSync(videoPath).size;
 
     let start: number;
@@ -37,10 +36,22 @@ export class AppService {
 
     // create video read stream for this particular chunk
     const videoStream = createReadStream(videoPath, { start, end });
-    return { end, start, videoSize, stream: videoStream };
+    return {
+      end,
+      start,
+      videoSize,
+      stream: videoStream };
   }
 
-  saveAndPublishVideo(videoData: VideoUploadMetadata) {
-    this.clientKafka.emit('video-data', 'hello world');
+  saveAndPublishVideo(file: Express.Multer.File, videoData: VideoUploadMetadata) {
+    const id = uuidv4();
+    const fileWriter = createWriteStream(`./${process.env.VIDEO_DIR}/${id}`);
+    fileWriter.write(file.buffer);
+
+    const uploadEvent: VideoUploadEvent = {
+      id,
+      ...videoData
+    };
+    this.clientKafka.emit('video-data', uploadEvent);
   }
 }
