@@ -14,7 +14,7 @@ export class PlaylistService {
                 data: {
                     title: playlist.title,
                     playlistPosition: {
-                        create: playlist.videos,
+                        create: playlist.playlistPosition,
                     }
                 }
             });
@@ -35,7 +35,7 @@ export class PlaylistService {
                     title: playlist.title,
                     playlistPosition: {
                         upsert: positionUpdateStatement,
-                        delete: positionDeleteStatement,
+                        deleteMany: positionDeleteStatement
                     }
                 },
                 where: {
@@ -94,6 +94,7 @@ export class PlaylistService {
                         select: {
                             video: true,
                             position: true,
+                            videoId: true,
                         }
                     },
                 },
@@ -108,35 +109,30 @@ export class PlaylistService {
     }
 
     private getPosDeleteAndUpdateStatement(playlist: PlaylistDto, id: string) {
-        const [toUpsert, toDelete] = playlist.videos?.reduce((result, element) => {
-            result[element.delete ? 1 : 0].push(element);
-            return result;
-        }, [[], []] as [PlaylistPositionDto[], PlaylistPositionDto[]]);
-        const positionUpdateStatement = toUpsert?.map((video) => {
+        const videoIds: string[] = [];
+        const positionUpdateStatement = playlist.playlistPosition?.map((pos) => {
+            videoIds.push(pos.videoId)
             return {
                 where: {
                     videoId_playlistId: {
-                        videoId: video.videoId,
+                        videoId: pos.videoId,
                         playlistId: id,
                     },
                 },
                 update: {
-                    position: video.position,
+                    position: pos.position,
                 },
                 create: {
-                    videoId: video.videoId,
-                    position: video.position,
+                    videoId: pos.videoId,
+                    position: pos.position,
                 }
             };
         });
-        const positionDeleteStatement = toDelete?.map((video) => {
-            return {
-                videoId_playlistId: {
-                    videoId: video.videoId,
-                    playlistId: id,
-                }
-            };
-        });
+        const positionDeleteStatement = { 
+            videoId: {
+                notIn: videoIds,
+            }
+        };
         return { positionUpdateStatement, positionDeleteStatement };
     }
 
