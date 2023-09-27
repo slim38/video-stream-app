@@ -1,9 +1,10 @@
-import { Controller, Logger } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Put, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Ctx, EventPattern, KafkaContext, Payload } from '@nestjs/microservices';
 import { VideoEventDTO } from './models/video-event.dto';
 import { validate } from 'class-validator';
 import { VideoService } from './video.service';
 import { VideoDeleteEventDTO } from './models/video-delete-event.dto';
+import { VideoUpdateDto } from './models/video-update.dto';
 
 @Controller('video')
 export class VideoController {
@@ -48,5 +49,25 @@ export class VideoController {
         }
 
         return true;
+    }
+
+    @Get('search/:searchword')
+    async searchVideoData(@Param('searchword') searchword: string) {
+        this.logger.log('Searching Videos: ' + searchword);
+        return this.service.getVideos(searchword);
+    }
+
+    @Get()
+    async getAllVideos() {
+        this.logger.log('Retrieving all videos.');
+        return this.service.getVideos();
+    }
+
+    @Put(':id')
+    @UsePipes(new ValidationPipe({ whitelist: true }))
+    async update(@Param('id') id: string, @Body() data: VideoUpdateDto) {
+        console.log(data);
+        this.logger.log(`Updating Video ${id}`);
+        return this.service.updateVideo(id, data);
     }
 }
