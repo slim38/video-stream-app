@@ -1,0 +1,24 @@
+{
+  "name": "video-stream-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "run": "docker-compose up -d",
+    "stop": "docker-compose down",
+    "run:db": "docker-compose -f ./dev-db/docker-compose.yml up -d",
+    "stop:db": "docker-compose -f ./dev-db/docker-compose.yml down",
+    "run:kafka": "docker-compose -f ./kafka-docker-compose/docker-compose.yml up -d",
+    "stop:kafka": "docker-compose -f ./kafka-docker-compose/docker-compose.yml down"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slim38/video-stream-app.git"
+  },
+  "author": "Selim Kaan Baykara",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/slim38/video-stream-app/issues"
+  },
+  "homepage": "https://github.com/slim38/video-stream-app#readme"
+}
