@@ -1,6 +1,6 @@
 import { Playlist, PlaylistPosition } from "@prisma/client";
 import { Type } from "class-transformer";
-import { IsNotEmpty, IsOptional, ValidateNested } from "class-validator";
+import { IsNotEmpty, IsOptional, ValidateIf, ValidateNested } from "class-validator";
 
 export interface PlaylistDto extends Pick<Playlist, "title"> {
     videos: PlaylistPositionDto[];
@@ -10,8 +10,12 @@ export class PlaylistPositionDto implements Omit<PlaylistPosition, "playlistId">
     @IsNotEmpty()
     videoId: string;
 
+    @ValidateIf((o) => !(o.delete === true))
     @IsNotEmpty()
     position: number;
+
+    @IsOptional()
+    delete?: boolean;
 }
 
 export class PlaylistCreateDto implements PlaylistDto {

@@ -56,6 +56,7 @@ export class AppService {
       ...videoData
     };
     this.clientKafka.emit('video-data', uploadEvent);
+    this.logger.log('New Video saved and published');
   }
 
   async deleteVideo(id: string) {
@@ -69,5 +70,6 @@ export class AppService {
       throw new InternalServerErrorException('Could not delete video file. ' + err);
     }
     this.clientKafka.emit('video-data-delete', { id });
+    this.logger.log('Video deleted and deletion published');
   }
 }

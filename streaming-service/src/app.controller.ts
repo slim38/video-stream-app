@@ -63,12 +63,14 @@ export class AppController {
     file: Express.Multer.File,
     @Body() body: VideoUploadMetadataDTO
   ) {
+    this.logger.log('Saving and publishing new Video');
     this.appService.saveAndPublishVideo(file, body);
   }
 
   @Delete(':id')
   @HttpCode(204)
   async delete(@Param('id') id: string) {
+    this.logger.log('Deleting Video.');
     return this.appService.deleteVideo(id);
   }
 }
