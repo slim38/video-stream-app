@@ -2,3 +2,4 @@
 streaming-service/node_modules
 streaming-service/dist
 streaming-service/videos/*
+dev-db/db-data
