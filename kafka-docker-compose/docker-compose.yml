@@ -40,5 +40,6 @@ services:
     image: confluentinc/cp-kafka:7.3.2
     depends_on:
       - broker
-    command: kafka-topics --create --topic video-data --partitions 2 --if-not-exists --bootstrap-server broker:29092
+    command: ["/bin/bash", "-c", "kafka-topics --create --topic video-data --partitions 2 --if-not-exists --bootstrap-server broker:29092 \
+             && kafka-topics --create --topic video-data-delete --partitions 2 --if-not-exists --bootstrap-server broker:29092"]
     restart: on-failure

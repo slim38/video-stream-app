@@ -1,12 +1,15 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { PartialVideoData } from './models/partial-video-data.interface';
 import { createReadStream, createWriteStream, statSync } from 'fs';
-import { VideoUploadEvent, VideoUploadMetadata } from './models/video-upload-metadata.interface';
+import { unlink } from 'fs/promises';
+import { VideoEvent, VideoUploadMetadata } from './models/video-upload-metadata.interface';
 import { ClientKafka } from '@nestjs/microservices';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AppService {
+  private readonly logger = new Logger(AppService.name);
+
   constructor(
     @Inject('PUBLISHER_SERVICE')
     private readonly clientKafka: ClientKafka
@@ -48,10 +51,23 @@ export class AppService {
     const fileWriter = createWriteStream(`./${process.env.VIDEO_DIR}/${id}`);
     fileWriter.write(file.buffer);
 
-    const uploadEvent: VideoUploadEvent = {
+    const uploadEvent: VideoEvent = {
       id,
       ...videoData
     };
     this.clientKafka.emit('video-data', uploadEvent);
+  }
+
+  async deleteVideo(id: string) {
+    try {
+      await unlink(`${process.env.VIDEO_DIR}/${id}`);
+    } catch (err) {
+      this.logger.error('Failed deleting video file. ' + err);
+      if (err?.code === 'ENOENT') {
+        throw new NotFoundException(`Video ${id} not found.`);
+      }
+      throw new InternalServerErrorException('Could not delete video file. ' + err);
+    }
+    this.clientKafka.emit('video-data-delete', { id });
   }
 }

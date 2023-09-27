@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Inject, Logger, OnModuleInit, Param, ParseFilePipe, ParseFilePipeBuilder, Post, Req, Res, UploadedFile, UploadedFiles, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Inject, Logger, OnModuleInit, Param, ParseFilePipe, ParseFilePipeBuilder, Post, Req, Res, UploadedFile, UploadedFiles, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Request, Response, response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express/multer';
@@ -42,6 +42,7 @@ export class AppController {
   }
 
   @Post('uploadTest')
+  @HttpCode(201)
   async uploadFile(@Req() request: Request, @Res() response: Response) {
     const writeFile = createWriteStream('./videos/uploaded1.mp4');
     request.on('end', () => { response.send() });
@@ -49,6 +50,7 @@ export class AppController {
   }
 
   @Post()
+  @HttpCode(201)
   @UsePipes(new ValidationPipe())
   @UseInterceptors(FileInterceptor('file'))
   uploadFile2(
@@ -62,5 +64,11 @@ export class AppController {
     @Body() body: VideoUploadMetadataDTO
   ) {
     this.appService.saveAndPublishVideo(file, body);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  async delete(@Param('id') id: string) {
+    return this.appService.deleteVideo(id);
   }
 }
