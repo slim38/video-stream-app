@@ -14,7 +14,8 @@ async function bootstrap() {
         consumer: {
           groupId: 'streaming-service-mod'
         }
-    }});
+  }});
+  console.log(process.env.KAFKA_BROKER)
   
   await app.startAllMicroservices();
   await app.listen(3000);

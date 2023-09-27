@@ -6,7 +6,7 @@ services:
       VIDEO_DIR: ./videos
       KAFKA_BROKER: "broker:29092"
     ports:
-      - "3000:3000"
+      - "3001:3001"
     volumes:
       - "./streaming-service/videos:/usr/app/videos"
     depends_on:
@@ -15,6 +15,22 @@ services:
         default:
             aliases:  
                 - streaming-service
+    
+  video-data-service:
+    build: ./video-data-service
+    environment:
+      VIDEO_DIR: ./videos
+      KAFKA_BROKER: "broker:29092"
+      DATABASE_URL: "postgresql://admin:admin@postgres-db:5432/video-data?schema=public"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - broker
+      - db
+    networks:
+        default:
+            aliases:  
+                - video-data-service
 
   zookeeper:
     extends:  
@@ -35,6 +51,11 @@ services:
     extends:
       file: ./kafka-docker-compose/docker-compose.yml
       service: kafka-init-topics
+
+  db:
+    extends:
+      file: ./dev-db/docker-compose.yml
+      service: postgres
 
 networks:
   default:
