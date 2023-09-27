@@ -1,6 +1,6 @@
 import { Inject, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { PartialVideoData } from './models/partial-video-data.interface';
-import { createReadStream, createWriteStream, statSync } from 'fs';
+import { ReadStream, createReadStream, createWriteStream, statSync } from 'fs';
 import { unlink } from 'fs/promises';
 import { VideoEvent, VideoUploadMetadata } from './models/video-upload-metadata.interface';
 import { ClientKafka } from '@nestjs/microservices';
@@ -22,7 +22,12 @@ export class AppService {
   
   getPartialVideoData(id: string, range: string): PartialVideoData {
     const videoPath = `${process.env.VIDEO_DIR}/${id}`;
-    const videoSize = statSync(videoPath).size;
+    let videoSize: number;
+    try {
+      videoSize = statSync(videoPath).size;;
+    } catch (err) {
+      this.handleFsReadError(err, id);
+    }
 
     let start: number;
     let end: number;
@@ -38,12 +43,26 @@ export class AppService {
     }
 
     // create video read stream for this particular chunk
-    const videoStream = createReadStream(videoPath, { start, end });
+    let videoStream: ReadStream;
+    try {
+      videoStream = createReadStream(videoPath, { start, end });
+    } catch (err) {
+      this.handleFsReadError(err, id);
+    }
     return {
       end,
       start,
       videoSize,
-      stream: videoStream };
+      stream: videoStream
+    };
+  }
+
+  private handleFsReadError(err: any, id: string) {
+    this.logger.error('Failed reading video file. ' + err);
+    if (err?.code === 'ENOENT') {
+      throw new NotFoundException(`Video ${id} not found.`);
+    }
+    throw new InternalServerErrorException('Could not read video file. ' + err);
   }
 
   saveAndPublishVideo(file: Express.Multer.File, videoData: VideoUploadMetadata) {
