@@ -24,13 +24,11 @@ model Playlist {
 }
 
 model PlaylistPosition {
-  video   Video  @relation(fields: [videoId], references: [id])
-  videoId String
-
-  playlist   Playlist @relation(fields: [playlistId], references: [id])
+  video      Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  videoId    String
+  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
   playlistId String
-
-  position Int
+  position   Int
 
   @@id([videoId, playlistId])
 }
