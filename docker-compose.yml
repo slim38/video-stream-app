@@ -23,7 +23,7 @@ services:
       KAFKA_BROKER: "broker:29092"
       DATABASE_URL: "postgresql://admin:admin@postgres-db:5432/video-data?schema=public"
     ports:
-      - "3000:3000"
+      - "3002:3000"
     depends_on:
       - broker
       - db

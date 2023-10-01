@@ -26,5 +26,15 @@ COPY --from=builder \
     /usr/app/node_modules/ \
     /usr/app/node_modules
 
+COPY --from=builder \
+    /usr/app/start.sh \
+    /usr/app/
+
+COPY --from=builder \
+    /usr/app/prisma \
+    /usr/app/prisma
+
+RUN chmod +x /usr/app/start.sh
+
 EXPOSE 3000
-CMD ["node", "dist/main.js"]
+CMD ["/usr/app/start.sh"]

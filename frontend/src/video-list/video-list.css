@@ -1,0 +1,11 @@
+.list {
+    width: 100%;
+}
+
+.list div {
+    
+}
+
+.list div:not(:last-of-type) {
+    border-bottom: 1px solid grey;
+  }

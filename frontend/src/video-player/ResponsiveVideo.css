@@ -1,0 +1,36 @@
+/* ResponsiveVideo.css */
+.video-container {
+    width: 66.66%; /* 2/3 of the parent width */
+    float: left;
+    margin-left: 10px;
+    float: top;
+    margin-top: 10px
+  }
+
+
+  .navbar {
+    background-color: #333; /* Background color for the navigation bar */
+    display: flex; /* Display navigation items and button in a row */
+    justify-content: space-between; /* Space between items and button */
+    align-items: center; /* Vertically center items and button */
+  }
+  
+  .nav-list {
+    list-style: none; /* Remove list bullets */
+    padding: 0;
+    margin: 5px;
+    display: flex; /* Display navigation items horizontally */
+  }
+  
+  .nav-list li {
+    color: #fff; /* Text color for navigation links */
+    text-decoration: none; /* Remove underlines from links */
+    font-size: larger;
+    width: fit-content;
+  }
+  
+  video {
+    width: 100%; /* Make the video fill the container */
+    }
+
+  

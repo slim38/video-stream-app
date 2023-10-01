@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "run": "docker-compose up -d",
+    "start": "docker-compose up -d",
     "stop": "docker-compose down",
     "run:db": "docker-compose -f ./dev-db/docker-compose.yml up -d",
     "stop:db": "docker-compose -f ./dev-db/docker-compose.yml down",
