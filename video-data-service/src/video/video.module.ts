@@ -5,6 +5,6 @@ import { PrismaService } from 'src/prisma.service';
 
 @Module({
   providers: [VideoService, PrismaService],
-  controllers: [VideoController]
+  controllers: [VideoController],
 })
 export class VideoModule {}

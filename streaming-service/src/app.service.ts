@@ -36,7 +36,7 @@ export class AppService {
       end = videoSize - 1;
     } else {
       // Parse Range
-      // Example: "bytes=32324-"
+      // Example: "bytes=32324-323265"
       const CHUNK_SIZE = 10 ** 6; // 1MB
       start = Number(range.replace(/\D/g, ""));
       end = Math.min(start + CHUNK_SIZE, videoSize - 1);
@@ -92,6 +92,7 @@ export class AppService {
       }
       throw new InternalServerErrorException('Could not delete video file. ' + err);
     }
+    this.clientKafka.emit('video-data-delete', { id });
     this.logger.log('Video deleted and deletion published');
   }
 }
