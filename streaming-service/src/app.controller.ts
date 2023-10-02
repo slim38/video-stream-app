@@ -4,14 +4,12 @@ import { Request, Response, response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express/multer';
 import { createWriteStream } from 'fs';
 import { VideoUploadMetadataDTO } from './models/video-upload-metadata.interface';
-import { VideoFileValidator } from './validators/video-file-validator';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import { MP4_MAGIC_NUMBER, FLV_MAGIC_NUMBER, MOV_MAGIV_NUMBER } from './app.constants';
 
 @Controller('videos')
 export class AppController {
-  fileValidator = new VideoFileValidator();
   constructor(
     private readonly appService: AppService,
     ) { }
@@ -87,10 +85,5 @@ export class AppController {
   async delete(@Param('id') id: string) {
     this.logger.log('Deleting Video.');
     return this.appService.deleteVideo(id);
-  }
-
-
-  private hasMagicNumber(magicNumber: number[] ,buffers: Buffer) : boolean {
-    return magicNumber.every((header, index) => header === buffers[index])
   }
 }

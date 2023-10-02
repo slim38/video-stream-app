@@ -69,10 +69,12 @@ export function VideoUpdateScreen() {
           </ul>
         </nav>
             <h3>Edit Video: {videoState.currentVideo?.title}</h3>
-            <input ref={titleRef} type='text' defaultValue={videoState.currentVideo?.title}/>
-            <input ref={descRef} type='text' defaultValue={videoState.currentVideo?.description}/>
-            <button onClick={onDelete}>Delete Video</button>
-            <button onClick={onSave} >Save</button>
+            <table>
+            <tr><td>Title</td><td><input ref={titleRef} type='text' defaultValue={videoState.currentVideo?.title}/></td></tr>
+            <tr><td>Description</td><td><input ref={descRef} type='text' defaultValue={videoState.currentVideo?.description}/></td></tr>
+            <tr><td></td><td><button onClick={onDelete}>Delete Video</button></td></tr>
+            <tr><td><button onClick={onSave} >Save</button></td></tr>
+            </table>
         </div>
     )
 }

@@ -30,8 +30,6 @@ const VideoUpload: React.FC = () => {
       formData.append('title', titleRef.current?.value ?? '');
       formData.append('description', descRef.current?.value ?? '');
 
-      // Make a request to your server to handle the file upload
-      // Example using fetch:
       fetch(process.env.REACT_APP_STREAMING_API_URL!, {
         method: 'POST',
         body: formData,
@@ -61,7 +59,6 @@ const VideoUpload: React.FC = () => {
           }
         })
         .catch((error) => {
-          // Handle any errors here
           console.error('Error:', error);
           uploadErrorRes = error;
 
@@ -71,11 +68,13 @@ const VideoUpload: React.FC = () => {
 
   return (
     <div>
-      <input ref={titleRef} type='text'/>
-      <input ref={descRef} type='text'/>
-      <input type='file' onChange={handleFileChange} />
-      <button onClick={handleUpload}>Upload</button>
-      {uploadErrorRes ? 'ERROR: ' + errorMessage: ''}
+      <table>
+      <tr><td>Title</td><td><input ref={titleRef} type='text'/></td></tr>
+      <tr><td>Description</td><td><input ref={descRef} type='text'/></td></tr>
+      <tr><td></td><td><input type='file' onChange={handleFileChange} /></td></tr>
+      <tr><td></td><td><button onClick={handleUpload}>Upload</button></td></tr>
+      <tr><td>{uploadErrorRes ? 'ERROR: ' + errorMessage: ''}</td></tr>
+      </table>
     </div>
   );
 };
