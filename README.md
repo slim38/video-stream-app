@@ -4,10 +4,10 @@
 
 ### Requirements
 - Node.js
-- Docker
+- Docker-Desktop
 
 ### Initialize DB (necessary at the first start):
-- Use the docker-compose file in 'dev-db' to start the db in docker-compose
+- Use the docker-compose file in 'dev-db' to start the db in Docker
 - Wait until it is up and running
 - Open dir 'video-data-service' in a terminal
 - Run 'npm i'
