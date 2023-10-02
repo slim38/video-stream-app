@@ -16,7 +16,7 @@
 - Use the docker-compose file in 'dev-db' to stop the database.
 
 ### Run all Backend Components
-- Run 'npm i' in the project root directory.
+- Run 'npm run start' in the project root directory.
 
 
 ## Run Frontend:
