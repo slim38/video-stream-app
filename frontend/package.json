@@ -1,7 +1,9 @@
 {
   "name": "frontend",
   "version": "0.1.0",
+  "main": "main.js",
   "private": true,
+  "homepage": "./",
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.6",
     "@testing-library/jest-dom": "^5.17.0",
@@ -44,6 +46,7 @@
     ]
   },
   "devDependencies": {
+    "electron": "^26.3.0",
     "eslint": "^8.50.0",
     "prettier": "^3.0.3"
   }
